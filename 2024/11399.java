@@ -19,7 +19,7 @@ class Main
 			arr[i] = Integer.parseInt(st.nextToken()); // 공백 단위로 끊은 시간을 int형으로 배열에 저장
 		}
 
-    // 오름차순으로 저장
+		    // 오름차순으로 저장
 		for(int i = 0; i < n; i++) {
 			for(int j = i + 1; j < n; j++) {
 				if(arr[i] > arr[j]) {
@@ -30,8 +30,8 @@ class Main
 			}
 		}
 
-    // 문제 예시에 있는 (1) + (1 + 2) + (1 + 2 + 3) + ... 처럼,
-    // 제일 작은 수부터 차례로 반복해서 더해지므로 arr[i]를 (n - i)번씩 곱해서 더해줌
+		    // 문제 예시에 있는 (1) + (1 + 2) + (1 + 2 + 3) + ... 처럼,
+		    // 제일 작은 수부터 차례로 반복해서 더해지므로 arr[i]를 (n - i)번씩 곱해서 더해줌
 		int result = 0;
 		for(int i = 0; i < n; i++) {
 			result += arr[i] * (n - i);
