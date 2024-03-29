@@ -35,7 +35,7 @@ int main() {
 	for(int i = 0; i < m; i++) {
 		cin >> input1 >> input2;
 
-    // input1-input2가 연결되어 있음을 저장
+    		// input1-input2가 연결되어 있음을 저장
 		arr[input1][input2] = 1;
 		arr[input2][input1] = 1;
 	}
