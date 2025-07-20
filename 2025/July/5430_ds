@@ -1,0 +1,63 @@
+#include <iostream>
+#include <string>
+#include <deque>
+using namespace std;
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	
+	int t;
+	cin >> t;
+	
+	for (int i = 0; i < t; i++) {
+		string p, inputN;
+		int n;
+		cin >> p >> n >> inputN;
+		
+		deque<int> nums;
+		string numStr = "";
+		
+		bool error = false, reversed = false;
+		
+		// 배열이 "[99,10,15]" 처럼 두 자리 이상일 수도 있어서 ','를 기준으로 제대로 파싱해야 함
+		for (char c : inputN) {
+			if (isdigit(c)) {
+				numStr += c;
+			} else if ((c == ',' || c == ']') && !numStr.empty()) { // numStr이 비어있으면 stoi 호출 시 에러
+				nums.push_back(stoi(numStr));
+				numStr = "";
+			}
+		}
+		
+		for (char c: p) {
+			if (c == 'R') {
+				reversed = !reversed;
+			} else if (c == 'D' && !nums.empty()) {
+				if (!reversed) nums.pop_front();
+				else nums.pop_back();
+			} else {
+				cout << "error" << "\n";
+				error = true;
+				break;
+			}
+		}
+		
+		if (!error) {
+			cout << "[";
+			if (!reversed) {
+				for (int i = 0; i < nums.size(); i++) {
+					cout << nums[i];
+					if (i != nums.size() - 1) cout <<",";
+				}
+			}
+			else {
+				for (int i = nums.size() - 1; i >= 0; i--) {
+					cout << nums[i];
+					if (i != 0) cout <<",";
+				}
+			}
+			cout << "]" << "\n";
+		}
+	}
+}
