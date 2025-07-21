@@ -1,0 +1,39 @@
+#include <iostream>
+#include <set>
+#include <string>
+using namespace std;
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	
+	int t;
+	cin >> t;
+	
+	while (t--) {
+		int k;
+		cin >> k;
+		
+		multiset<int> ms; // multiset: 자동 정렬, 중복 허용, 양방향 삭제 가능
+		
+		for (int i = 0; i < k; i++) {
+			char cmd;
+			int num;
+			cin >> cmd >> num;
+			
+			if (cmd == 'I') ms.insert(num);
+			else if (cmd == 'D' && !ms.empty()) {
+				if (num == 1) {
+					auto it = prev(ms.end()); // 마지막에서 한 칸 앞의 반복자 => 최대값을 가리킴
+					ms.erase(it);
+				} else {
+					auto it = ms.begin(); // 최소값을 가리킴
+					ms.erase(it);
+				}
+			}
+		}
+		
+		if (ms.empty()) cout << "EMPTY\n";
+		else cout << *prev(ms.end()) << " " << *ms.begin() << "\n"; // *을 통해 값에 접근해야 함
+	}
+}
