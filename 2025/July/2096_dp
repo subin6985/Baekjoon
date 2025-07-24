@@ -1,0 +1,40 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+	int n;
+	cin >> n;
+	
+	// 전체 배열이 아니라
+	// 이전 최대/최소, 현재 최대/최소만 있어도 됨 (메모리 절약)
+	int prevMax[3] = {0}; int prevMin[3] = {0};
+	int currMax[3] = {0}; int currMin[3] = {0};
+	
+	cin >> prevMax[0] >> prevMax[1] >> prevMax[2]; // 첫 번째 행만 입력받음
+	prevMin[0] = prevMax[0];
+	prevMin[1] = prevMax[1];
+	prevMin[2] = prevMax[2];
+	
+	for (int i = 1; i < n; i++) {
+		int a, b, c;
+		cin >> a >> b >> c; // 한 행씩 입력
+		
+		currMax[0] = max(prevMax[0], prevMax[1]) + a;
+		currMax[1] = max({prevMax[0], prevMax[1], prevMax[2]}) + b;
+		currMax[2] = max(prevMax[1], prevMax[2]) + c;
+		
+		currMin[0] = min(prevMin[0], prevMin[1]) + a;
+		currMin[1] = min({prevMin[0], prevMin[1], prevMin[2]}) + b;
+		currMin[2] = min(prevMin[1], prevMin[2]) + c;
+		
+		for (int j = 0; j < 3; j++) {
+			prevMax[j] = currMax[j];
+			prevMin[j] = currMin[j];
+		}
+	}
+
+  // n = 1 일 경우도 있으니 prev 출력
+	cout << max({prevMax[0], prevMax[1], prevMax[2]}) << " " << min({prevMin[0], prevMin[1], prevMin[2]});
+}
