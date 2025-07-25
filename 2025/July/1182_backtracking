@@ -1,0 +1,33 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int n, s;
+int sum = 0;
+int cnt = 0;
+vector<int> nums;
+
+void backtrack(int i) {
+	if (sum == s) cnt++;
+	
+	for (int j = i; j < n; j++) {
+		sum += nums[j];
+		backtrack(j + 1); // 한 번 더한 수는 다시 더하지 않아서 (더한 위치 + 1)을 넘겨줌
+		sum -= nums[j];
+	}
+}
+
+int main() {
+	cin >> n >> s;
+	
+	nums.resize(n);
+	
+	for (int i = 0; i < n; i++) {
+		cin >> nums[i];
+	}
+	
+	backtrack(0);
+	
+	if (s == 0) cnt--; // 공집합은 포함 x
+	cout << cnt;
+}
