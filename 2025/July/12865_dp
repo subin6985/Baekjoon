@@ -1,0 +1,28 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+	int n, k;
+	cin >> n >> k;
+	
+	vector<vector<int>> things(n, vector<int>(2));
+	for (int i = 0; i < n; i++) {
+		cin >> things[i][0] >> things[i][1];
+	}
+	
+	vector<int> dp(k + 1, 0); // 무게가 w일 때 최대 가치 v
+	
+	for (int i = 0; i < n; i++) {
+		int weight = things[i][0];
+		int value = things[i][1];
+
+    // 같은 물건을 중복으로 담지 않기 위해 역순으로 업데이트
+		for (int j = k; j >= weight; j--) {
+			dp[j] = max(dp[j], dp[j - weight] + value);
+		}
+	}
+	
+	cout << dp[k];
+}
