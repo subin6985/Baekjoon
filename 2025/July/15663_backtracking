@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int n, m;
+int len = 0;
+vector<int> nums;
+vector<int> cnt(10001, 0);
+vector<int> used(10001, 0);
+vector<int> result;
+
+void backtrack(int depth) {
+	if (depth == m) {
+		for (int i = 0; i < m; i++) {
+			cout << result[i] << " ";
+		}
+		cout << "\n";
+	}
+	
+	for (int i = 0; i < len; i++) {
+		int num = nums[i];
+		if (used[num] < cnt[num]) {
+			used[num]++;
+			result.push_back(num);
+			backtrack(depth + 1); // 같은 수를 cnt[num]만큼 사용할 수 있고, 길이가 중요하므로 (depth + 1) 넘김
+			result.pop_back();
+			used[num]--;
+		}
+	}
+}
+
+int main() {
+	cin >> n >> m;
+	
+	nums.resize(n);
+	
+	for (int i = 0; i < n; i++) {
+		int a;
+		cin >> a;
+		if (cnt[a] == 0) nums[len++] = a;
+		cnt[a]++;
+	}
+	
+	sort(nums.begin(), nums.begin() + len);
+	
+	backtrack(0);
+}
