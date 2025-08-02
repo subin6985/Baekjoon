@@ -1,0 +1,94 @@
+#include <iostream>
+#include <queue>
+using namespace std;
+
+int R, C;
+char map[55][55];
+bool visit[55][55] = { false };
+
+pair<int, int> dest; // 비버의 굴 위치
+
+queue<pair<int, int>> hedgeQ; // 고슴도치의 이동 큐
+queue<pair<int, int>> waterQ; // 물이 퍼지는 큐
+
+int dir[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+int cnt = 0; // 이동 횟수
+
+void bfs() {
+	while(!hedgeQ.empty()) {
+		cnt++;
+  
+    // 먼저 기존 큐에 있던 물이 퍼짐
+		int waterSize = waterQ.size();
+		for (int i = 0; i < waterSize; i++) {
+			int r = waterQ.front().first;
+			int c = waterQ.front().second;
+			waterQ.pop();
+			
+			for (int i = 0; i < 4; i++) {
+				int newR = r + dir[i][0];
+				int newC = c + dir[i][1];
+
+        // 맵의 범위를 넘어갈 경우
+				if (newR < 0 || newC < 0 || newR >= R || newC >= C) continue;
+
+        // X, D인 경우 못 감
+				if (map[newR][newC] == '.') {
+					map[newR][newC] = '*';
+					waterQ.push({newR, newC});
+				}
+			}
+		}
+
+    // 그 후 고슴도치가 이동
+		int hedgeSize = hedgeQ.size();
+		for (int i = 0; i < hedgeSize; i++) {
+			int r = hedgeQ.front().first;
+			int c = hedgeQ.front().second;
+			hedgeQ.pop();
+			
+			for (int i = 0; i < 4; i++) {
+				int newR = r + dir[i][0];
+				int newC = c + dir[i][1];
+				
+				if (newR < 0 || newC < 0 || newR >= R || newC >= C) continue;
+        // 이미 방문했으면 가지 않음
+				if (visit[newR][newC]) continue;
+
+        // X, *인 경우 못 감
+				if (map[newR][newC] == '.' || map[newR][newC] == 'D') {
+					visit[newR][newC] = true;
+					hedgeQ.push({newR, newC});
+				}
+			}
+		}
+
+    // 목적지에 도착한 경우
+		if (visit[dest.first][dest.second]) break;
+	}
+}
+
+int main() {
+	cin >> R >> C;
+	
+	for (int i = 0; i < R; i++) {
+		for (int j = 0; j < C; j++) {
+			cin >> map[i][j];
+			if (map[i][j] == 'S') {
+				hedgeQ.push({i, j});
+				visit[i][j] = true;
+			}
+			else if (map[i][j] == 'D') dest = {i, j};
+			else if (map[i][j] == '*') {
+				waterQ.push({i, j});
+				visit[i][j] = true;
+			}
+		}
+	}
+	
+	bfs();
+	
+	if (visit[dest.first][dest.second]) cout << cnt;
+	else cout << "KAKTUS";
+}
