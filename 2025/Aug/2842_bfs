@@ -1,0 +1,112 @@
+#if 1
+#include <iostream>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+int N;
+char map[50][50];
+int height[50][50];
+pair<int, int> post;
+int ans = 1000000;
+int kCnt = 0;
+int heightCnt;
+int heightList[2505];
+int minPiro = 1000000;
+
+int dir[8][2] = { {0,-1},{1,-1},{1,0},{1,1},{0,1},{-1,1},{-1,0},{-1,-1} };
+
+int search(int left, int right) {
+	// 맵을 돌아다니면서
+	// 높이 최소값보다 작거나, 최대값보다 높으면 안 가고
+	// 집을 방문 후
+	// 방문한 집 개수 반환
+	if (height[post.first][post.second] < left || height[post.first][post.second] > right)
+		return 0;
+
+	queue<pair<int, int>> q;
+	q.push(post);
+
+	bool visit[50][50] = { false };
+	visit[q.front().first][q.front().second] = true;
+
+	int visitedKCnt = 0;
+	
+	while (!q.empty()) {
+		int r = q.front().first;
+		int c = q.front().second;
+		q.pop();
+
+		for (int i = 0; i < 8; i++) {
+			int newR = r + dir[i][0];
+			int newC = c + dir[i][1];
+			if (newR < 0 || newC < 0 || newR >= N || newC >= N) continue;
+			
+			if (visit[newR][newC]) continue;
+
+			int newH = height[newR][newC];
+			if (newH < left || newH > right) continue;
+
+			if (map[newR][newC] == 'K') visitedKCnt++;
+
+			q.push({ newR, newC });
+			visit[newR][newC] = true;
+		}
+	}
+
+	return visitedKCnt;
+}
+
+void exec() {
+	int left = 0, right = 0;
+
+	while (left <= right && right < heightCnt) {
+		// left, right의 제약을 두고 맵 전체탐색을 한 후, 방문할 수 있는 집의 개수 확인
+		int result = search(heightList[left], heightList[right]);
+		if (result == kCnt) {
+			int piro = heightList[right] - heightList[left];
+			if (piro < minPiro) {
+				minPiro = piro;
+			}
+			left++;
+		}
+		else {
+			right++;
+		}
+	}
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	cin >> N;
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			cin >> map[i][j];
+			if (map[i][j] == 'P') post = { i, j };
+			else if (map[i][j] == 'K') kCnt++;
+		}
+	}
+
+	bool heightCheck[1000001] = { false };
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			int h; cin >> h;
+			height[i][j] = h;
+			if (!heightCheck[h]) {
+				heightList[heightCnt++] = h;
+				heightCheck[h] = true;
+			}
+		}
+	}
+
+	sort(heightList, heightList + heightCnt);
+
+	exec();
+
+	cout << minPiro;
+}
+#endif
