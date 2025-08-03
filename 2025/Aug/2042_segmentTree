@@ -1,0 +1,58 @@
+#if 1
+#include <iostream>
+using namespace std;
+
+int N, M, K;
+long long tree[2097152]; // 2^21 (대략 4백만)
+long long leafStart = 1048576; // 리프노드가 시작하는 인덱스 (2^20)
+
+void update(int idx, long long val) {
+	long long leafIdx = leafStart + idx - 1;
+	tree[leafIdx] = val;
+	while (leafIdx >= 1) {
+		leafIdx /= 2;
+		tree[leafIdx] = tree[leafIdx * 2] + tree[leafIdx * 2 + 1];
+	}
+}
+
+long long get(int l, int r) { // l부터 r까지의 합을 조회
+	long long ret = 0;
+
+	// 인덱스가 짝수면 왼쪽 노드, 홀수면 오른쪽 노드
+	while (left <= right) {
+		if (left % 2 == 1) sum += tree[left++]; // left가 오른쪽 노드면(right와 부모를 공유하지 않으면) 더함
+		if (right % 2 == 0) sum += tree[right--]; // right가 왼쪽 노드면 더함
+		left /= 2;
+		right /= 2;
+	}
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	cin >> N >> M >> K;
+
+	for (int i = 0; i < N; i++) {
+		cin >> tree[leafStart + i];
+	}
+
+	for (int i = leafStart - 1; i >= 1; i--) {
+		tree[i] = tree[i * 2] + tree[i * 2 + 1];
+	}
+
+	for (int i = 0; i < M + K; i++) {
+		long long x, y, z;
+		cin >> x >> y >> z;
+
+		if (x == 1) {
+			update(y, z);
+		}
+		else {
+			long long result = get(leafStart + y - 1, leafStart + z - 1);
+			cout << result << "\n";
+		}
+	}
+}
+#endif
