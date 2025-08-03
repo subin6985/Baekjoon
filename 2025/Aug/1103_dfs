@@ -1,0 +1,59 @@
+#include <iostream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int N, M;
+string board[55];
+int dp[55][55]; // (r,c)에서 시작했을 때 최대 이동 횟수
+bool visit[55][55] = { false };
+int dir[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+int res = 0;
+bool infinite = false;
+
+void dfs(int r, int c, int cnt) {
+	if (infinite) return;
+	
+	if (cnt <= dp[r][c]) return; // 더 작으면 더 이상 탐색하지 않아도 됨 (이전에 더 깊이 탐색해봤으므로)
+	dp[r][c] = cnt;
+	
+	int a = board[r][c] - '0';
+	
+	for (int i = 0; i < 4; i++) {
+		int newR = r + a * dir[i][0];
+		int newC = c + a * dir[i][1];
+		
+		if (newR < 0 || newC < 0 || newR >= N || newC >= M || board[newR][newC] == 'H') {
+			res = max(cnt, res);
+			continue;
+		}
+		
+		if (visit[newR][newC]) {
+			infinite = true;
+			return;
+		}
+		
+		visit[newR][newC] = true;
+		dfs(newR, newC, cnt + 1);
+		visit[newR][newC] = false;
+	}
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+	
+	cin >> N >> M;
+	
+	for (int i = 0; i < N; i++) {
+		cin >> board[i];
+	}
+	
+	visit[0][0] = true;
+	dp[0][0] = 0;
+	dfs(0, 0, 1);
+	
+	if (infinite) cout << "-1";
+	else cout << res;
+}
