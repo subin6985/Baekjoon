@@ -1,0 +1,65 @@
+#include <iostream>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+pair<int, int> house[105];
+pair<int, int> chicken[15];
+int houseCnt = 0;
+int chkCnt = 0;
+bool sel[15] = { false };
+int minLen = 1e9;
+
+int N, M;
+
+void dfs(int idx, int cnt) {
+	if (cnt == M) {
+		int len = 0;
+		for (int i = 0; i < houseCnt; i++) {
+			int houseR = house[i].first;
+			int houseC = house[i].second;
+			
+			int curLen = 1e9;
+			
+			for (int j = 0; j < chkCnt; j++) {
+				if (!sel[j]) continue; // 선택하지 않은 치킨집이면 패스
+				
+				int chkR = chicken[j].first;
+				int chkC = chicken[j].second;
+				
+				curLen = min(curLen, abs(houseR - chkR) + abs(houseC - chkC));
+			}
+			
+			len += curLen;
+		}
+		
+		minLen = min(minLen, len);
+	}
+    
+    if (idx == chkCnt) return;
+    
+	sel[idx] = true;
+	dfs(idx + 1, cnt + 1);
+	sel[idx] = false;
+	dfs(idx + 1, cnt);
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+	
+	cin >> N >> M;
+	
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			int a; cin >> a;
+			if (a == 1) house[houseCnt++] = {i, j};
+			else if (a == 2) chicken[chkCnt++] = {i, j};
+		}
+	}
+	
+	dfs(0, 0);
+	
+	cout << minLen;
+}
