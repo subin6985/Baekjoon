@@ -1,0 +1,57 @@
+#if 1
+#include <iostream>
+#include <vector>
+#include <tuple>
+using namespace std;
+
+typedef long long ll;
+ll INF = 1e10;
+
+int N, M;
+vector<tuple<int, int, int>> graph;
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	cin >> N >> M;
+
+	for (int i = 0; i < M; i++) {
+		int A, B, C;
+		cin >> A >> B >> C;
+		graph.push_back({ A,B,C });
+	}
+
+	vector<ll> dist(N + 1, INF);
+	dist[1] = 0;
+
+	// 벨만-포드 알고리즘
+	for (int i = 1; i <= N - 1; i++) {
+		for (tuple<int, int, int> edge : graph) {
+			int u = get<0>(edge);
+			int v = get<1>(edge);
+			int cost = get<2>(edge);
+			if (dist[u] != INF && dist[v] > dist[u] + cost) {
+				dist[v] = dist[u] + cost;
+			}
+		}
+	}
+
+	// 음수 사이클 체크
+	for (tuple<int, int, int> edge : graph) {
+		int u = get<0>(edge);
+		int v = get<1>(edge);
+		int cost = get<2>(edge);
+		if (dist[u] != INF && dist[v] > dist[u] + cost) {
+			cout << "-1\n";
+			return 0;
+		}
+	}
+
+	for (int i = 2; i <= N; i++) {
+		if (dist[i] == INF) cout << "-1\n";
+		else cout << dist[i] << "\n";
+	}
+}
+#endif
