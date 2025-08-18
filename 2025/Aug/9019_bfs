@@ -1,0 +1,105 @@
+#include <iostream>
+#include <queue>
+#include <string>
+#include <vector>
+using namespace std;
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	int T;
+	cin >> T;
+
+	while (T--) {
+		int A, B;
+		cin >> A >> B;
+
+		bool visited[10000] = { false }; // 0~9999까지의 수의 방문 여부를 저장하여 중복이 없게 함
+		vector<int> parent(10000, -1); // 이전 노드 (명령어 역추적용)
+		vector<char> cmd(10000); // 현재 명령어
+		
+		visited[A] = true;
+
+		queue<int> q;
+		q.push(A);
+
+		while (!q.empty()) {
+			int cur = q.front();
+			q.pop();
+
+			if (cur == B) break;
+
+			// D
+			int d = 2 * cur % 10000;
+			if (!visited[d]) {
+				visited[d] = true;
+				parent[d] = cur; // 현재 수를 연산된 수의 부모로 저장
+				cmd[d] = 'D';
+				q.push(d);
+			}
+
+			// S
+			int s = cur - 1;
+			if (cur == 0 && !visited[9999]) {
+				visited[9999] = true;
+				parent[9999] = cur;
+				cmd[9999] = 'S';
+				q.push(9999);
+			}
+			else if (cur != 0 && !visited[s]) {
+				visited[s] = true;
+				parent[s] = cur;
+				cmd[s] = 'S';
+				q.push(s);
+			}
+
+			// 10 -> 0010 형식으로 변환
+			string strA = to_string(cur);
+			int len = strA.length();
+			for (int i = 0; i < 4 - len; i++) {
+				strA = "0" + strA;
+			}
+
+			// L
+			string left = "";
+			for (int i = 1; i < 4; i++) {
+				left += strA[i];
+			}
+			left += strA[0];
+
+			int l = stoi(left);
+			if (!visited[l]) {
+				visited[l] = true;
+				parent[l] = cur;
+				cmd[l] = 'L';
+				q.push(l);
+			}
+
+			// R
+			string right = "";
+			right += strA[3];
+			for (int i = 0; i < 3; i++) {
+				right += strA[i];
+			}
+
+			int r = stoi(right);
+			if (!visited[r]) {
+				visited[r] = true;
+				parent[r] = cur;
+				cmd[r] = 'R';
+				q.push(r);
+			}
+		}
+
+		string res = "";
+		int cur = B;
+		while (cur != A) { // A(원래 수)가 되기 전까지
+			res = cmd[cur] + res;
+			cur = parent[cur];
+		}
+
+		cout << res << "\n";
+	}
+}
