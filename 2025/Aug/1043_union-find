@@ -1,0 +1,75 @@
+#if 1
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int N, M;
+int parent[51];
+
+void initialize() {
+	for (int i = 1; i <= N; i++) {
+		parent[i] = i;
+	}
+}
+
+int findParent(int x) {
+	if (parent[x] == x) return x;
+	return parent[x] = findParent(parent[x]);
+}
+
+void unionParent(int a, int b) {
+	a = findParent(a);
+	b = findParent(b);
+	parent[b] = a;
+}
+
+int main() {
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	cin >> N >> M;
+
+	initialize();
+
+	int t; cin >> t;
+	vector<int> truth(t);
+	for (int i = 0; i < t; i++) cin >> truth[i];
+
+	vector<vector<int>> parties(M);
+	for (int i = 0; i < M; i++) {
+		int k; cin >> k;
+		for (int j = 0; j < k; j++) {
+			int a; cin >> a;
+			parties[i].push_back(a);
+		}
+
+		// 모임끼리 union
+		for (int j = 1; j < k; j++) {
+			unionParent(parties[i][0], parties[i][j]);
+		}
+	}
+
+	if (t == 0) { // 아무도 진실을 모름
+		cout << M;
+		return 0;
+	}
+
+	// 진실 아는 사람들을 union
+	for (int i = 1; i < t; i++) {
+		unionParent(truth[0], truth[i]);
+	}
+
+	int res = 0;
+	for (int i = 0; i < M; i++) {
+		bool safe = true;
+		for (int p : parties[i]) {
+			if (findParent(p) == findParent(truth[0])) safe = false;
+			if (!safe) break;
+		}
+		if (safe) res++;
+	}
+
+	cout << res;
+}
+#endif
