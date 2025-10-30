@@ -1,0 +1,66 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+int N, K;
+
+vector<string> words;
+vector<bool> learned(26, false);
+
+int wordCnt = 0;
+int learnedCnt = 5;
+
+void backtrack(int i) {
+	if (learnedCnt == K) {
+		int tempCnt = 0;
+		for (int j = 0; j < N; j++) {
+			bool able = true;
+			for (char c : words[j]) {
+				if (learned[c - 'a']) continue;
+				able = false;
+				break;
+			}
+			if (able) tempCnt++;
+		}
+		if (tempCnt > wordCnt) wordCnt = tempCnt;
+		return;
+	}
+
+	if (i == 26) return;
+
+	for (int j = i; j < 26; j++) {
+		if (learned[j]) continue;
+		learned[j] = true;
+		learnedCnt++;
+		backtrack(j + 1);
+		learnedCnt--;
+		learned[j] = false;
+	}
+}
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie();
+
+	cin >> N >> K;
+
+	learned['a' - 'a'] = true;
+	learned['n' - 'a'] = true;
+	learned['t' - 'a'] = true;
+	learned['i' - 'a'] = true;
+	learned['c' - 'a'] = true;
+
+	for (int i = 0; i < N; i++) {
+		string s; cin >> s;
+		s = s.substr(4, s.size() - 8); // "anta"와 "tica" 제거
+		words.push_back(s);
+	}
+
+	if (K < 5) cout << 0;
+	else if (K == 26) cout << N; // 모든 단어를 다 배울 수 있는 경우
+	else {
+		backtrack(0);
+		cout << wordCnt;
+	}
+}
