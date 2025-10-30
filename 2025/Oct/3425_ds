@@ -1,0 +1,200 @@
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <string>
+#include <cmath>
+using namespace std;
+
+stack<int> numStack;
+
+// 스택이 비어있는 경우
+bool isEmpty() {
+	if (numStack.empty()) {
+		cout << "ERROR\n";
+		return true;
+	}
+	return false;
+}
+
+// 연산에 필요한 만큼(2)보다 적게 들어있을 경우
+bool isNotEnough() {
+	if (numStack.size() < 2) {
+		cout << "ERROR\n";
+		return true;
+	}
+	return false;
+}
+
+int main() {
+	string s;
+
+	while (1) {
+		vector<string> cmdQ;
+
+		cin >> s;
+		if (s == "QUIT") break;
+
+		while (s != "END") {
+			if (s == "NUM") {
+				int num; cin >> num;
+				cmdQ.push_back(to_string(num));
+			}
+			else cmdQ.push_back(s);
+			cin >> s;
+		}
+
+		int cnt; cin >> cnt;
+		for (int i = 0; i < cnt; i++) {
+			bool error = false;
+
+			int n; cin >> n;
+			numStack.push(n);
+
+			for (int i = 0; i < cmdQ.size(); i++) {
+				string cmd = cmdQ[i];
+
+				if (cmd == "POP") {
+					if (isEmpty()) {
+						error = true;
+						break;
+					}
+					numStack.pop();
+				}
+				else if (cmd == "INV") {
+					if (isEmpty()) {
+						error = true;
+						break;
+					}
+					int fst = numStack.top(); numStack.pop();
+					fst *= -1;
+					numStack.push(fst);
+				}
+				else if (cmd == "DUP") {
+					if (isEmpty()) {
+						error = true;
+						break;
+					}
+					numStack.push(numStack.top());
+				}
+				else if (cmd == "SWP") {
+					if (isNotEnough()) {
+						error = true;
+						break;
+					}
+					int fst = numStack.top(); numStack.pop();
+					int scd = numStack.top(); numStack.pop();
+					numStack.push(fst); numStack.push(scd);
+				}
+				else if (cmd == "ADD") {
+					if (isNotEnough()) {
+						error = true;
+						break;
+					}
+					int fst = numStack.top(); numStack.pop();
+					int scd = numStack.top(); numStack.pop();
+
+					long long temp = fst + scd;
+					if (abs(temp) > 1e9) {
+						cout << "ERROR\n";
+						error = true;
+						break;
+					}
+
+					numStack.push(fst + scd);
+				}
+				else if (cmd == "SUB") {
+					if (isNotEnough()) {
+						error = true;
+						break;
+					}
+					int fst = numStack.top(); numStack.pop();
+					int scd = numStack.top(); numStack.pop();
+
+					long long temp = scd - fst;
+					if (abs(temp) > 1e9) {
+						cout << "ERROR\n";
+						error = true;
+						break;
+					}
+
+					numStack.push(scd - fst);
+				}
+				else if (cmd == "MUL") {
+					if (isNotEnough()) {
+						error = true;
+						break;
+					}
+					int fst = numStack.top(); numStack.pop();
+					int scd = numStack.top(); numStack.pop();
+
+					long long temp = 1LL * fst * scd; // 오버플로우 방지
+					if (abs(temp) > 1e9) {
+						cout << "ERROR\n";
+						error = true;
+						break;
+					}
+
+					numStack.push(fst * scd);
+				}
+				else if (cmd == "DIV") {
+					if (isNotEnough()) {
+						error = true;
+						break;
+					}
+					int fst = numStack.top(); numStack.pop();
+					int scd = numStack.top(); numStack.pop();
+
+					// 0으로 나눌 경우 에러
+					if (fst == 0) {
+						cout << "ERROR\n";
+						error = true;
+						break;
+					}
+
+					bool isMinus = false;
+					if (fst < 0) isMinus = !isMinus;
+					if (scd < 0) isMinus = !isMinus;
+					
+					int res = abs(scd) / abs(fst);
+					if (isMinus) res *= -1;
+
+					numStack.push(res);
+				}
+				else if (cmd == "MOD") {
+					if (isNotEnough()) {
+						error = true;
+						break;
+					}
+					int fst = numStack.top(); numStack.pop();
+					int scd = numStack.top(); numStack.pop();
+
+					if (fst == 0) {
+						cout << "ERROR\n";
+						error = true;
+						break;
+					}
+
+					int res = abs(scd) % abs(fst);
+					if (scd < 0) res *= -1;
+
+					numStack.push(res);
+				}
+				else {
+					numStack.push(stoi(cmd));
+				}
+			}
+
+			if (!error && numStack.size() != 1) {
+				cout << "ERROR\n";
+				error = true;
+			}
+			if (!error) {
+				cout << numStack.top() << "\n";
+			}
+
+			while (!numStack.empty()) numStack.pop();
+		}
+
+		cout << "\n";
+	}
+}
