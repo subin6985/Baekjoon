@@ -1,0 +1,55 @@
+#include <iostream>
+#include <string>
+#include <queue>
+using namespace std;
+
+int main() {
+	int N, K, M;
+	cin >> N >> K;
+
+	string s = to_string(N);
+	M = s.size();
+
+	queue<string> q;
+	q.push(s);
+
+	int cnt = 0;
+	bool able = false;
+	int res;
+	while (1) {
+		if (cnt == K) {
+			able = true;
+			break;
+		}
+
+		int size = q.size();
+		res = 0;
+
+		for (int i = 0; i < size; i++) {
+			string now = q.front(); q.pop();
+
+			for (int j = 0; j < M; j++) {
+				for (int k = j + 1; k < M; k++) {
+					if (j == 0 && now[k] == '0') continue;
+
+					string next = now;
+					swap(next[j], next[k]);
+					if (stoi(next) > res) {
+						res = stoi(next);
+						q.push(next);
+					}
+				}
+			}
+		}
+
+		if (q.empty()) break;
+		cnt++;
+	}
+
+	if (!able) {
+		cout << -1;
+	}
+	else {
+		cout << res;
+	}
+}
