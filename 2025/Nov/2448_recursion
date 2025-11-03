@@ -1,0 +1,42 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+char star[3072][6143];
+
+// 분할 정복
+void saveStars(int r, int c, int n) {
+	// 맨 위 작은 삼각형을 기본 모양으로 둠
+	if (n == 3) {
+		star[r][c] = '*';
+		star[r + 1][c - 1] = '*';
+		star[r + 1][c + 1] = '*';
+		star[r + 2][c - 2] = '*';
+		star[r + 2][c - 1] = '*';
+		star[r + 2][c] = '*';
+		star[r + 2][c + 1] = '*';
+		star[r + 2][c + 2] = '*';
+	}
+	else {
+		saveStars(r, c, n / 2);
+		saveStars(r + n / 2, c - n / 2, n / 2);
+		saveStars(r + n / 2, c + n / 2, n / 2);
+	}
+}
+
+int main() {
+	int N;
+	cin >> N;
+
+	// 공백으로 초기화
+	memset(star, ' ', sizeof(star));
+
+	saveStars(0, N - 1, N);
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < 2 * N - 1; j++) {
+			cout << star[i][j];
+		}
+		cout << "\n";
+	}
+}
