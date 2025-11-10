@@ -1,0 +1,52 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+bool cmp(pair<int, int> p1, pair<int, int> p2) {
+	if (p1.first == p2.first) {
+		return p1.second < p2.second; // 인덱스 작은 게 앞으로
+	}
+	return p1.first > p2.first;
+}
+
+int main() {
+	int N; cin >> N;
+
+	vector<pair<int, int>> arrA; // { 값, 인덱스 }
+	for (int i = 0; i < N; i++) {
+		int n; cin >> n;
+		arrA.push_back({ n,i });
+	}
+
+	int M; cin >> M;
+
+	vector<pair<int, int>> arrB;
+	for (int i = 0; i < M; i++) {
+		int n; cin >> n;
+		arrB.push_back({ n,i });
+	}
+
+	sort(arrA.begin(), arrA.end(), cmp);
+	sort(arrB.begin(), arrB.end(), cmp);
+
+	vector<int> res;
+	int lastIdxA = -1;
+	int lastIdxB = -1;
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (arrA[i].first == arrB[j].first && arrA[i].second > lastIdxA && arrB[j].second > lastIdxB) {
+				lastIdxA = arrA[i].second;
+				lastIdxB = arrB[j].second;
+				res.push_back(arrB[j].first);
+				break;
+			}
+		}
+	}
+
+	cout << res.size() << "\n";
+	for (int i = 0; i < res.size(); i++) {
+		cout << res[i] << " ";
+	}
+}
