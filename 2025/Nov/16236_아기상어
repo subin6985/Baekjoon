@@ -1,0 +1,95 @@
+#if 1
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+struct Point {
+    int r, c, dist;
+};
+
+int dir[4][2] = { {-1,0},{0,-1},{0,1},{1,0} }; // 상, 좌, 우, 하 (문제 조건: 위-왼-오-아래)
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int N;
+    cin >> N;
+
+    vector<vector<int>> map(N, vector<int>(N));
+    pair<int, int> sharkPos;
+    int sharkSize = 2, eatCnt = 0, time = 0;
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            cin >> map[i][j];
+            if (map[i][j] == 9) {
+                sharkPos = { i,j };
+                map[i][j] = 0;
+            }
+        }
+    }
+
+    while (true) {
+        vector<vector<int>> visited(N, vector<int>(N, -1));
+        queue<Point> q;
+        q.push({ sharkPos.first, sharkPos.second, 0 });
+        visited[sharkPos.first][sharkPos.second] = 0;
+
+        vector<Point> fishList;
+        int minDist = -1;
+
+        while (!q.empty()) {
+            Point cur = q.front(); q.pop();
+
+            // 최소 거리보다 멀어지면 더 탐색할 필요 없음
+            if (minDist != -1 && cur.dist > minDist) break;
+
+            for (int i = 0; i < 4; i++) {
+                int nr = cur.r + dir[i][0];
+                int nc = cur.c + dir[i][1];
+
+                if (nr < 0 || nc < 0 || nr >= N || nc >= N) continue;
+                if (visited[nr][nc] != -1) continue;
+                if (map[nr][nc] > sharkSize) continue; // 몸집보다 큰 물고기 이동 불가
+
+                visited[nr][nc] = cur.dist + 1;
+
+                // 먹을 수 있는 물고기
+                if (map[nr][nc] != 0 && map[nr][nc] < sharkSize) {
+                    fishList.push_back({ nr,nc,cur.dist + 1 });
+                    if (minDist == -1 || cur.dist + 1 < minDist) minDist = cur.dist + 1;
+                }
+
+                q.push({ nr,nc,cur.dist + 1 });
+            }
+        }
+
+        if (fishList.empty()) break; // 먹을 수 있는 물고기 없음 → 종료
+
+        // 위-왼쪽 우선순위로 정렬
+        sort(fishList.begin(), fishList.end(), [](const Point& a, const Point& b) {
+            if (a.dist != b.dist) return a.dist < b.dist;
+            if (a.r != b.r) return a.r < b.r;
+            return a.c < b.c;
+            });
+
+        Point target = fishList[0];
+
+        // 상어 이동
+        sharkPos = { target.r, target.c };
+        time += target.dist;
+
+        map[target.r][target.c] = 0; // 물고기 먹음
+        eatCnt++;
+        if (eatCnt == sharkSize) {
+            sharkSize++;
+            eatCnt = 0;
+        }
+    }
+
+    cout << time;
+}
+#endif
