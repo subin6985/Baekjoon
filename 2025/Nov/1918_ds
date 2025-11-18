@@ -1,0 +1,47 @@
+#if 1
+#include <iostream>
+#include <string>
+#include <stack>
+using namespace std;
+
+int main() {
+	string str;  cin >> str;
+
+	stack<char> d;
+
+	for (char c : str) {
+		if (c >= 'A' && c <= 'Z') {
+			d.push(c);
+		}
+		else if (c == '*' || c == '/') {
+			while (!d.empty() && ((d.top() >= 'A' && d.top() <= 'Z') || d.top() == '/' || d.top() == '*')) {
+				cout << d.top();
+				d.pop();
+			}
+			d.push(c);
+		}
+		else if (c == '+' || c == '-') {
+			while (!d.empty() && ((d.top() >= 'A' && d.top() <= 'Z') || d.top() == '*' || d.top() == '/' || d.top() == '+' || d.top() == '-')) {
+				cout << d.top();
+				d.pop();
+			}
+			d.push(c);
+		}
+		else if (c == '(') {
+			d.push(c);
+		}
+		else if (c == ')') {
+			while (!d.empty() && d.top() != '(') {
+				cout << d.top();
+				d.pop();
+			}
+			d.pop();
+		}
+	}
+
+	while (!d.empty()) {
+		cout << d.top();
+		d.pop();
+	}
+}
+#endif
