@@ -1,0 +1,49 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+int main() {
+	int N;
+	cin >> N;
+	
+	vector<int> trait(N);
+	
+	for (int i = 0; i < N; i++) {
+		cin >> trait[i];
+	}
+	
+	sort(trait.begin(), trait.end());
+	
+	vector<int> res(3);
+	for (int i = 0; i < 3; i++) res[i] = trait[i];
+	
+	long long sum = 3000000000;
+	
+	// 하나를 고정하고 나머지 두 개를 투 포인터로 탐색
+	for (int i = 0; i < N - 2; i++) {
+		int left = i + 1;
+		int right = N - 1;
+		
+		while (left < right) {
+			long long tempSum = (long long)trait[i] + trait[left] + trait[right];
+			
+			if (abs(tempSum) < abs(sum)) {
+				sum = tempSum;
+				res[0] = trait[i];
+				res[1] = trait[left];
+				res[2] = trait[right];
+			}
+			
+			if (tempSum < 0) left++;
+			else right--;
+		}
+	}
+	
+	sort(res.begin(), res.end());
+	
+	for (int i = 0; i < 3; i++) {
+		cout << res[i] << " ";
+	}
+}
