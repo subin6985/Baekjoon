@@ -1,0 +1,33 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+	int N; cin >> N;
+	
+	vector<int> arr(N);
+	
+	for (int i = 0; i < N; i++) {
+		cin >> arr[i];
+	}
+	
+	vector<int> lst;
+	lst.push_back(arr[0]);
+	
+	int maxLength = 1;
+	
+	for (int i = 1; i < N; i++) {
+		if (arr[i] > lst[maxLength - 1]) {
+			lst.push_back(arr[i]);
+			maxLength++;
+		}
+		else {
+			int lb = lower_bound(lst.begin(), lst.end(), arr[i]) - lst.begin();
+			
+			lst[lb] = arr[i];
+		}
+	}
+	
+	cout << maxLength;
+}
