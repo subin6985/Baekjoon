@@ -1,0 +1,100 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <queue>
+#include <cmath>
+using namespace std;
+
+vector<string> board;
+
+struct State {
+	int rr, rc, br, bc, depth;
+};
+
+pair<int, int> move(int r, int c, int dr, int dc) {
+	while (board[r + dr][c + dc] != '#' && board[r][c] != 'O') {
+		r += dr;
+		c += dc;
+	}
+	
+	return {r, c};
+}
+
+int main() {
+	int N, M; cin >> N >> M;
+	
+	board.assign(N, "");
+	
+	for (int i = 0; i < N; i++) {
+		cin >> board[i];
+	}
+	
+	// 방문한 상태를 저장
+	bool visited[10][10][10][10] = { false };
+	queue<State> q;
+	
+	int startRR, startRC, startBR, startBC;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (board[i][j] == 'R') {
+				startRR = i; startRC = j;
+			}
+			else if (board[i][j] == 'B') {
+				startBR = i; startBC = j;
+			}
+		}
+	}
+	
+	q.push({startRR,startRC,startBR,startBC,0});
+	visited[startRR][startRC][startBR][startBC] = true;
+	
+	// 4방향: 상하좌우
+	int dr[] = {-1, 1, 0, 0};
+	int dc[] = {0, 0, -1, 1};
+	
+	while (!q.empty()) {
+		State curr = q.front();
+		q.pop();
+		
+		if (curr.depth >= 10) continue;
+		
+		for (int dir = 0; dir < 4; dir++) {
+			// 빨간 구슬과 파란 구슬 이동
+			auto [nextRR, nextRC] = move(curr.rr, curr.rc, dr[dir], dc[dir]);
+			auto [nextBR, nextBC] = move(curr.br, curr.bc, dr[dir], dc[dir]);
+			
+			// 파란 구슬이 구멍에 빠진 경우
+			if (board[nextBR][nextBC] == 'O') continue;
+			
+			// 빨간 구슬이 구멍에 빠진 경우
+			if (board[nextRR][nextRC] == 'O') {
+				cout << curr.depth + 1;
+				return 0;
+			}
+			
+			// 두 구슬의 위치가 같은 경우
+			if (nextRR == nextBR && nextRC == nextBC) {
+				// 더 많이 이동한 구슬을 한 칸 뒤로
+				int redDist = abs(nextRR - curr.rr) + abs(nextRC - curr.rc);
+				int blueDist = abs(nextBR - curr.br) + abs(nextBC - curr.bc);
+				
+				if (redDist > blueDist) {
+					nextRR -= dr[dir];
+					nextRC -= dc[dir];
+				}
+				else {
+					nextBR -= dr[dir];
+					nextBC -= dc[dir];
+				}
+			}
+			
+			// 방문하지 않은 상태면 큐에 추가
+			if (!visited[nextRR][nextRC][nextBR][nextBC]) {
+				visited[nextRR][nextRC][nextBR][nextBC] = true;
+				q.push({nextRR,nextRC,nextBR,nextBC,curr.depth + 1});
+			}
+		}
+	}
+	
+	cout << -1;
+}
