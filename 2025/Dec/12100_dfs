@@ -1,0 +1,167 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int N;
+int res = 0;
+
+void right(vector<vector<int>>& board) {
+	for (int i = 0; i < N; i++) {
+		// 한 줄을 벡터로 뽑기
+		vector<int> v;
+
+		for (int j = N - 1; j >= 0; j--) {
+			if (board[i][j] != 0) v.push_back(board[i][j]);
+		}
+
+		vector<int> merged;
+
+		for (int j = 0; j < v.size(); j++) {
+			if (j + 1 < v.size() && v[j] == v[j + 1]) {
+				merged.push_back(v[j] * 2);
+				j++; // 한 번 합쳐지면 다음은 건너뜀
+			}
+			else {
+				merged.push_back(v[j]);
+			}
+		}
+
+		// 다시 보드에 채우기
+		for (int j = N - 1; j >= 0; j--) {
+			board[i][N - j - 1] = (j < merged.size() ? merged[j] : 0);
+		}
+	}
+}
+
+void left(vector<vector<int>>& board) {
+	for (int i = 0; i < N; i++) {
+		vector<int> v;
+
+		for (int j = 0; j < N; j++) {
+			if (board[i][j] != 0) v.push_back(board[i][j]);
+		}
+
+		vector<int> merged;
+
+		for (int j = 0; j < v.size(); j++) {
+			if (j + 1 < v.size() && v[j] == v[j + 1]) {
+				merged.push_back(v[j] * 2);
+				j++;
+			}
+			else {
+				merged.push_back(v[j]);
+			}
+		}
+
+		for (int j = 0; j < N; j++) {
+			board[i][j] = (j < merged.size() ? merged[j] : 0);
+		}
+	}
+}
+
+void down(vector<vector<int>>& board) {
+	for (int i = 0; i < N; i++) {
+		vector<int> v;
+
+		for (int j = N - 1; j >= 0; j--) {
+			if (board[j][i] != 0) v.push_back(board[j][i]);
+		}
+
+		vector<int> merged;
+
+		for (int j = 0; j < v.size(); j++) {
+			if (j + 1 < v.size() && v[j + 1] == v[j]) {
+				merged.push_back(v[j] * 2);
+				j++;
+			}
+			else {
+				merged.push_back(v[j]);
+			}
+		}
+
+		for (int j = N - 1; j >= 0; j--) {
+			board[N - j - 1][i] = (j < merged.size() ? merged[j] : 0);
+		}
+	}
+}
+
+void up(vector<vector<int>>& board) {
+	for (int i = 0; i < N; i++) {
+		vector<int> v;
+
+		for (int j = 0; j < N; j++) {
+			if (board[j][i] != 0) v.push_back(board[j][i]);
+		}
+
+		vector<int> merged;
+
+		for (int j = 0; j < v.size(); j++) {
+			if (j + 1 < v.size() && v[j + 1] == v[j]) {
+				merged.push_back(v[j] * 2);
+				j++;
+			}
+			else {
+				merged.push_back(v[j]);
+			}
+		}
+
+		for (int j = 0; j < N; j++) {
+			board[j][i] = (j < merged.size() ? merged[j] : 0);
+		}
+	}
+}
+
+void move(vector<vector<int>>& board, int dir) {
+	switch (dir) {
+		case 0:
+			right(board);
+			break;
+		case 1:
+			left(board);
+			break;
+		case 2:
+			down(board);
+			break;
+		default:
+			up(board);
+			break;
+	}
+}
+
+void findMax(vector<vector<int>>& board) {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (board[i][j] > res) res = board[i][j];
+		}
+	}
+}
+
+void dfs(int depth, vector<vector<int>>& board) {
+	if (depth == 5) {
+		findMax(board);
+		return;
+	}
+
+	for (int dir = 0; dir < 4; dir++) {
+		vector<vector<int>> next = board;
+		move(next, dir);
+		findMax(next);
+		dfs(depth + 1, next);
+	}
+}
+
+int main() {
+	cin >> N;
+
+	vector<vector<int>> board(N, vector<int>(N));
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			cin >> board[i][j];
+		}
+	}
+
+	dfs(0, board);
+
+	cout << res;
+}
