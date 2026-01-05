@@ -1,0 +1,47 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+int N, M;
+vector<string> map;
+vector<vector<int>> state; // 0: 방문 안 함, 1: 처리 중, 2: 처리 완료
+
+int cnt = 0;
+
+void dfs(int r, int c) {
+	state[r][c] = 1;
+
+	int nr = r; int nc = c;
+	if (map[nr][nc] == 'U') nr--;
+	else if (map[nr][nc] == 'D') nr++;
+	else if (map[nr][nc] == 'L') nc--;
+	else nc++;
+
+	if (state[nr][nc] == 0) dfs(nr, nc);
+	else if (state[nr][nc] == 1) cnt++; // 사이클
+	// 2를 만나면 기존의 사이클에 합류하는 것이므로 카운트 증가 X
+
+	state[r][c] = 2; // 처리 완료
+}
+
+int main() {
+	cin >> N >> M;
+
+	map.assign(N, "");
+	state.assign(N, vector<int>(M, 0));
+
+	for (int i = 0; i < N; i++) {
+		cin >> map[i];
+	}
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (state[i][j] == 0) {
+				dfs(i, j);
+			}
+		}
+	}
+
+	cout << cnt;
+}
