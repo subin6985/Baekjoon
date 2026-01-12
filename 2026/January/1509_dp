@@ -1,0 +1,45 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+	string str;
+	cin >> str;
+
+	int n = str.size();
+	// 팰린드롬 여부를 저장할 dp
+	vector<vector<bool>> palinDp(n, vector<bool>(n, false));
+
+	for (int k = 1; k <= n; k++) {
+		for (int i = 0; i < n - k + 1; i++) {
+			if (k == 1) palinDp[i][i] = true;
+			else if (k == 2) {
+				if (str[i] == str[i + 1]) {
+					palinDp[i][i + 1] = true;
+				}
+			}
+			else {
+				int j = i + k - 1;
+				if (str[i] == str[j] && palinDp[i + 1][j - 1]) {
+					palinDp[i][j] = true;
+				}
+			}
+		}
+	}
+
+	// i까지의 최소 팰린드롬 개수를 저장할 dp
+	vector<int> dp(n, 1e9);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j <= i; j++) {
+			if (palinDp[j][i]) {
+				if (j == 0) dp[i] = min(1, dp[i]);
+				else dp[i] = min(dp[j - 1] + 1, dp[i]);
+			}
+		}
+	}
+
+	cout << dp[n - 1];
+}
