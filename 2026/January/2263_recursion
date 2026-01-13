@@ -1,0 +1,47 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int n;
+vector<int> inorder;
+vector<int> postorder;
+vector<int> pos; // inorder의 위치를 미리 저장
+
+void tree(int inIdx1, int inIdx2, int postIdx1, int postIdx2) {
+	if (inIdx1 > inIdx2 || postIdx1 > postIdx2) return;
+
+	int root = postorder[postIdx2];
+
+	cout << root << " ";
+
+	int rootIdx = pos[root];
+	int leftSize = rootIdx - inIdx1;
+
+	// 왼쪽 서브트리
+	tree(inIdx1, rootIdx - 1, postIdx1, postIdx1 + leftSize - 1);
+
+	// 오른쪽 서브트리
+	tree(rootIdx + 1, inIdx2, postIdx1 + leftSize, postIdx2 - 1);
+}
+
+int main() {
+	cin >> n;
+
+	inorder.resize(n);
+	postorder.resize(n);
+	pos.resize(n + 1);
+
+	for (int i = 0; i < n; i++) {
+		cin >> inorder[i];
+	}
+
+	for (int i = 0; i < n; i++) {
+		cin >> postorder[i];
+	}
+
+	for (int i = 0; i < n; i++) {
+		pos[inorder[i]] = i;
+	}
+
+	tree(0, n - 1, 0, n - 1);
+}
