@@ -1,0 +1,44 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int N, M, K;
+
+vector<int> cards;
+vector<int> parent; // parent[x]: x 다음에 올 카드
+
+int findParent(int x) {
+	if (parent[x] == x) return x;
+	return parent[x] = findParent(parent[x]);
+}
+
+void unionParent(int a, int b) {
+	parent[a] = b;
+}
+
+int main() {
+	cin >> N >> M >> K;
+
+	cards.resize(M);
+	parent.resize(M);
+
+	for (int i = 0; i < M; i++) {
+		cin >> cards[i];
+		parent[i] = i; // parent를 인덱스로 다룸
+	}
+
+	sort(cards.begin(), cards.end());
+
+	for (int i = 0; i < K; i++) {
+		int n; cin >> n;
+
+		// n보다 큰 첫 번째 인덱스 찾기
+		int idx = upper_bound(cards.begin(), cards.end(), n) - cards.begin();
+		idx = findParent(idx);
+
+		cout << cards[idx] << "\n";
+
+		unionParent(idx, idx + 1);
+	}
+}
