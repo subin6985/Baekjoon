@@ -1,0 +1,53 @@
+#include <iostream>
+#include <map>
+#include <vector>
+#include <string>
+using namespace std;
+
+struct TrieNode {
+	// map을 쓰면 자동으로 사전순 정렬
+	map<string, int> child;
+};
+
+vector<TrieNode> trie;
+
+// 출력
+void dfs(int node, int depth) {
+	for (auto& it : trie[node].child) {
+		string key = it.first;
+		int next = it.second;
+
+		for (int i = 0; i < depth; i++) cout << "--";
+		cout << key << "\n";
+
+		dfs(next, depth + 1);
+	}
+}
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	int N; cin >> N;
+
+	trie.push_back(TrieNode()); // 0번 = root
+
+	for (int i = 0; i < N; i++) {
+		int K; cin >> K;
+
+		int cur = 0;
+
+		for (int i = 0; i < K; i++) {
+			string s; cin >> s;
+
+			if (trie[cur].child.count(s) == 0) {
+				trie[cur].child[s] = trie.size();
+				trie.push_back(TrieNode());
+			}
+			cur = trie[cur].child[s];
+		}
+	}
+
+	dfs(0, 0);
+}
