@@ -1,0 +1,47 @@
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+int N, M;
+int trouble[11];
+
+bool canPress(int num) {
+    if (num == 0) return !trouble[0];
+
+    while (num > 0) {
+        if (trouble[num % 10]) return false;
+        num /= 10;
+    }
+
+    return true;
+}
+
+int main() {
+    cin >> N >> M;
+
+    for (int i = 0; i < M; i++) {
+        int n; cin >> n;
+        trouble[n] = true;
+    }
+
+    if (N == 100) {
+        cout << 0;
+        return 0;
+    }
+
+    // 숫자 버튼을 하나도 안 쓰고 + / - 만 사용하는 경우
+    int res = abs(N - 100);
+
+    for (int i = 0; i <= 999999; i++) {
+        if (canPress(i)) {
+            // 숫자 버튼 + (+/-) 버튼
+            int temp = to_string(i).size() + abs(i - N);
+
+            res = min(res, temp);
+        }
+    }
+
+    cout << res;
+}
