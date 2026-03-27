@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> graph[20005];
+vector<int> color; // 0: 미방문, 1 / -1: 색칠
+
+bool dfs(int node, int c) {
+	color[node] = c;
+
+	for (int next : graph[node]) {
+		if (color[next] == 0) {
+			if (!dfs(next, -c)) return false;
+		}
+		else if (color[next] == c) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+int main() {
+	int K;
+	cin >> K;
+
+	for (int i = 0; i < K; i++) {
+		int V, E;
+		cin >> V >> E;
+
+		color.assign(V + 1, 0);
+
+		for (int j = 1; j <= V; j++) {
+			graph[j].clear();
+		}
+
+		for (int j = 0; j < E; j++) {
+			int u, v;
+			cin >> u >> v;
+
+			graph[u].push_back(v);
+			graph[v].push_back(u);
+		}
+
+		bool ok = true;
+
+		for (int j = 1; j <= V; j++) {
+			if (color[j] != 0) continue;
+
+			if (!dfs(j, 1)) {
+				ok = false;
+				break;
+			}
+		}
+
+		if (ok) cout << "YES\n";
+		else cout << "NO\n";
+	}
+}
