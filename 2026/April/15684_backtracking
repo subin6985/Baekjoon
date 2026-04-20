@@ -1,0 +1,92 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int N, M, H;
+vector<vector<bool>> graph; // graph[a][b]: b번 세로선과 b+1번 세로선을 a번 점선 위치에서 연결했는지
+int res = 1e9;
+
+int result(int n) {
+	for (int i = 1; i <= H; i++) {
+		if (n > 1 && graph[i][n - 1]) n--;
+		else if (n < N && graph[i][n]) n++;
+	}
+
+	return n;
+}
+
+bool check() {
+	bool able = true;
+
+	for (int i = 1; i <= N; i++) {
+		if (i != result(i)) {
+			able = false;
+			break;
+		}
+	}
+
+	return able;
+}
+
+bool dfs(int depth, int col, int cnt, int target) {
+	if (cnt == target) {
+		return check();
+	}
+
+	if (depth == H + 1) {
+		return false;
+	}
+
+	for (int i = col + 1; i < N; i++) {
+		if (!graph[depth][i]) {
+			bool able = true;
+			if (i > 1 && graph[depth][i - 1]) able = false;
+			if (i < N - 1 && graph[depth][i + 1]) able = false;
+			if (able) {
+				graph[depth][i] = true;
+				// 같은 depth에 간선을 2개 이상 놓는 경우 고려
+				// return dfs()를 해버리면 백트래킹이 안 됨
+				if (dfs(depth, i, cnt + 1, target)) {
+					return true;
+				}
+				graph[depth][i] = false;
+			}
+		}
+	}
+
+	if (dfs(depth + 1, 0, cnt, target)) {
+		return true;
+	}
+
+	return false;
+}
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	cin >> N >> M >> H;
+
+	graph.assign(H + 1, vector<bool>(N, false));
+
+	for (int i = 0; i < M; i++) {
+		int a, b;
+		cin >> a >> b;
+		graph[a][b] = true;
+	}
+
+	if (M == 0) cout << 0;
+	else {
+		// 3개 추가하는 경우까지만 고려하면 됨!
+		for (int target = 0; target <= 3; target++) {
+			if (dfs(1, 0, 0, target)) {
+				cout << target;
+				return 0;
+			}
+		}
+
+		cout << -1;
+	}
+}
