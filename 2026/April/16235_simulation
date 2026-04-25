@@ -1,0 +1,114 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <queue>
+using namespace std;
+
+int N, M, K;
+
+int dir[8][2] = { {-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1} };
+
+vector<vector<int>> nutrient;
+vector<vector<vector<int>>> tree;
+vector<vector<int>> A;
+
+int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	cin >> N >> M >> K;
+
+	nutrient.assign(N + 1, vector<int>(N + 1, 5));
+	tree.resize(N + 1, vector<vector<int>>(N + 1));
+	A.assign(N + 1, vector<int>(N + 1, 0));
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			cin >> A[i][j];
+		}
+	}
+
+	for (int i = 0; i < M; i++) {
+		int x, y, age;
+		cin >> x >> y >> age;
+		tree[x][y].push_back(age);
+	}
+
+	for (int i = 0; i < K; i++) {
+		// 봄 + 여름
+		for (int j = 1; j <= N; j++) {
+			for (int k = 1; k <= N; k++) {
+				if (tree[j][k].size() == 0) continue;
+
+				// 해당 칸의 나무를 나이 어린 순으로 정렬
+				sort(tree[j][k].begin(), tree[j][k].end());
+
+				// 살아있는 나무를 저장
+				vector<int> alive;
+				// 죽은 나무의 양분/2 합산
+				int deadNutrient = 0;
+
+				for (int l = 0; l < tree[j][k].size(); l++) {
+					int age = tree[j][k][l];
+
+					if (age == 0) continue; // 이미 죽은 나무
+
+					if (nutrient[j][k] >= age) {
+						nutrient[j][k] -= age;
+						alive.push_back(age + 1);
+					}
+					else {
+						deadNutrient += age / 2;
+					}
+				}
+
+				// 살아있는 나무만 남기기
+				tree[j][k] = alive;
+				// 여름까지 한 번에 구현
+				nutrient[j][k] += deadNutrient;
+			}
+		}
+
+		// 가을
+		for (int j = 1; j <= N; j++) {
+			for (int k = 1; k <= N; k++) {
+				if (tree[j][k].size() == 0) continue;
+
+				for (int l = 0; l < tree[j][k].size(); l++) {
+					int age = tree[j][k][l];
+
+					if (age == 0 || age % 5 != 0) continue; // 이미 죽은 나무거나 번식하는 나무가 아님
+
+					for (int m = 0; m < 8; m++) {
+						int nextR = j + dir[m][0];
+						int nextC = k + dir[m][1];
+
+						if (nextR < 1 || nextR > N || nextC < 1 || nextC > N) continue;
+
+						tree[nextR][nextC].push_back(1);
+					}
+				}
+			}
+		}
+
+		// 겨울
+		for (int j = 1; j <= N; j++) {
+			for (int k = 1; k <= N; k++) {
+				nutrient[j][k] += A[j][k];
+			}
+		}
+	}
+
+	int cnt = 0;
+
+	for (int i = 1; i <= N; i++) {
+		for (int j = 1; j <= N; j++) {
+			for (int k = 0; k < tree[i][j].size(); k++) {
+				if (tree[i][j][k] != 0) cnt++;
+			}
+		}
+	}
+
+	cout << cnt;
+}
